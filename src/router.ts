@@ -75,6 +75,7 @@ import {
   handleGetDevices,
   handleRevokeAllTrustedDevices,
   handleRevokeTrustedDevice,
+  handleDeleteAllDevices,
   handleDeleteDevice,
   handleUpdateDeviceToken
 } from './handlers/devices';
@@ -99,6 +100,14 @@ import {
   handleAdminSetUserStatus,
   handleAdminDeleteUser,
 } from './handlers/admin';
+import {
+  handleAdminExportBackup,
+  handleAdminImportBackup,
+} from './handlers/backup';
+import {
+  handleNotificationsHub,
+  handleNotificationsNegotiate,
+} from './handlers/notifications';
 
 function isSameOriginWriteRequest(request: Request): boolean {
   const targetOrigin = new URL(request.url).origin;
@@ -269,11 +278,12 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
   try {
 
     // Reject oversized bodies before any path-specific parsing.
-    // File upload paths enforce their own limits and are exempt here.
-    const isFileUploadPath =
+    // Large file/archive upload paths enforce their own limits and are exempt here.
+    const isLargeUploadPath =
       /^\/api\/ciphers\/[a-f0-9-]+\/attachment\/[a-f0-9-]+$/i.test(path) ||
-      /^\/api\/sends\/[a-f0-9-]+\/file\/[a-f0-9-]+$/i.test(path);
-    if (!isFileUploadPath) {
+      /^\/api\/sends\/[a-f0-9-]+\/file\/[a-f0-9-]+$/i.test(path) ||
+      path === '/api/admin/backup/import';
+    if (!isLargeUploadPath) {
       const contentLength = parseInt(request.headers.get('Content-Length') || '0', 10);
       if (contentLength > LIMITS.request.maxBodyBytes) {
         return errorResponse('Request body too large', 413);
@@ -468,6 +478,14 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
       return errorResponse('Server configuration error: JWT_SECRET is not set or too weak', 500);
     }
 
+    if (path === '/notifications/hub/negotiate' && method === 'POST') {
+      return handleNotificationsNegotiate(request, env);
+    }
+
+    if (path === '/notifications/hub' && method === 'GET') {
+      return handleNotificationsHub(request, env);
+    }
+
     // All other API endpoints require authentication
     const auth = new AuthService(env);
     const authHeader = request.headers.get('Authorization');
@@ -475,6 +493,13 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
 
     if (!payload) {
       return errorResponse('Unauthorized', 401);
+    }
+
+    const actingDeviceId = String(payload.did || '').trim();
+    if (actingDeviceId) {
+      const nextHeaders = new Headers(request.headers);
+      nextHeaders.set('X-NodeWarden-Acting-Device-Id', actingDeviceId);
+      request = new Request(request, { headers: nextHeaders });
     }
 
     const userId = payload.sub;
@@ -560,9 +585,8 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
       return handleSync(request, env, userId);
     }
 
-    // Notifications hub (stub): now requires authentication.
     if (path.startsWith('/notifications/')) {
-      return new Response(null, { status: 200 });
+      return errorResponse('Not found', 404);
     }
 
     // Cipher endpoints
@@ -745,8 +769,9 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
     }
 
     // Devices endpoint
-    if (path === '/api/devices' && method === 'GET') {
-      return handleGetDevices(request, env, userId);
+    if (path === '/api/devices') {
+      if (method === 'GET') return handleGetDevices(request, env, userId);
+      if (method === 'DELETE') return handleDeleteAllDevices(request, env, userId);
     }
 
     if (path === '/api/devices/authorized') {
@@ -769,6 +794,14 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
     // Admin endpoints
     if (path === '/api/admin/users' && method === 'GET') {
       return handleAdminListUsers(request, env, currentUser);
+    }
+
+    if (path === '/api/admin/backup/export' && method === 'POST') {
+      return handleAdminExportBackup(request, env, currentUser);
+    }
+
+    if (path === '/api/admin/backup/import' && method === 'POST') {
+      return handleAdminImportBackup(request, env, currentUser);
     }
 
     if (path === '/api/admin/invites') {
