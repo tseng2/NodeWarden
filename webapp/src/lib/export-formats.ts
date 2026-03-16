@@ -1,7 +1,7 @@
 import { argon2idAsync } from '@noble/hashes/argon2.js';
 import { strToU8, zipSync } from 'fflate';
 import { Uint8ArrayReader, Uint8ArrayWriter, ZipReader, ZipWriter, configure as configureZipJs } from '@zip.js/zip.js';
-import type { PreloginKdfConfig } from './api';
+import type { PreloginKdfConfig } from './api/auth';
 import { base64ToBytes, bytesToBase64, decryptBw, decryptStr, encryptBw, hkdfExpand, pbkdf2 } from './crypto';
 import type { Cipher, Folder } from './types';
 
@@ -110,10 +110,6 @@ function randomGuid(): string {
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
-}
-
-function toAesBuffer(bytes: Uint8Array): ArrayBuffer {
-  return new Uint8Array(bytes).buffer;
 }
 
 async function getCipherKeyParts(cipher: Cipher, userEnc: Uint8Array, userMac: Uint8Array): Promise<{ enc: Uint8Array; mac: Uint8Array }> {

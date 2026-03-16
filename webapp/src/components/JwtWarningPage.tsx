@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'preact/hooks';
 import { AlertTriangle, Copy, RefreshCw } from 'lucide-preact';
+import { copyTextToClipboard } from '@/lib/clipboard';
 import StandalonePageFrame from '@/components/StandalonePageFrame';
 import { t } from '@/lib/i18n';
 
@@ -55,8 +56,10 @@ export default function JwtWarningPage(props: JwtWarningPageProps) {
                 type="button"
                 className="btn btn-secondary"
                 onClick={async () => {
-                  await navigator.clipboard.writeText(generatedSecret);
-                  setCopyHint(t('txt_copied'));
+                  await copyTextToClipboard(generatedSecret, {
+                    onSuccess: () => setCopyHint(t('txt_copied')),
+                    onError: () => setCopyHint(t('txt_copy_failed')),
+                  });
                   window.setTimeout(() => setCopyHint(''), 1500);
                 }}
               >
@@ -74,10 +77,15 @@ export default function JwtWarningPage(props: JwtWarningPageProps) {
 
 function generateJwtSecret(length: number): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-  const bytes = crypto.getRandomValues(new Uint8Array(length));
   let out = '';
-  for (let i = 0; i < length; i += 1) {
-    out += chars[bytes[i] % chars.length];
+  const maxUnbiasedByte = Math.floor(256 / chars.length) * chars.length;
+  while (out.length < length) {
+    const bytes = crypto.getRandomValues(new Uint8Array(length));
+    for (const value of bytes) {
+      if (value >= maxUnbiasedByte) continue;
+      out += chars[value % chars.length];
+      if (out.length >= length) break;
+    }
   }
   return out;
 }

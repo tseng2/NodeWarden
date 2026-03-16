@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { Clipboard, KeyRound, RefreshCw, ShieldCheck, ShieldOff } from 'lucide-preact';
+import { copyTextToClipboard } from '@/lib/clipboard';
 import qrcode from 'qrcode-generator';
 import type { Profile } from '@/lib/types';
 import { t } from '@/lib/i18n';
@@ -16,9 +17,16 @@ interface SettingsPageProps {
 
 function randomBase32Secret(length: number): string {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  const random = crypto.getRandomValues(new Uint8Array(length));
   let out = '';
-  for (const x of random) out += alphabet[x % alphabet.length];
+  const maxUnbiasedByte = Math.floor(256 / alphabet.length) * alphabet.length;
+  while (out.length < length) {
+    const random = crypto.getRandomValues(new Uint8Array(length));
+    for (const x of random) {
+      if (x >= maxUnbiasedByte) continue;
+      out += alphabet[x % alphabet.length];
+      if (out.length >= length) break;
+    }
+  }
   return out;
 }
 
@@ -137,8 +145,7 @@ export default function SettingsPage(props: SettingsPageProps) {
                       className="btn btn-secondary"
                       disabled={totpLocked}
                       onClick={() => {
-                        void navigator.clipboard.writeText(secret);
-                        props.onNotify?.('success', t('txt_secret_copied'));
+                        void copyTextToClipboard(secret, { successMessage: t('txt_secret_copied') });
                       }}
                     >
                       <Clipboard size={14} className="btn-icon" />
@@ -178,8 +185,7 @@ export default function SettingsPage(props: SettingsPageProps) {
                 className="btn btn-secondary"
                 disabled={!recoveryCode}
                 onClick={() => {
-                  void navigator.clipboard.writeText(recoveryCode);
-                  props.onNotify?.('success', t('txt_recovery_code_copied'));
+                  void copyTextToClipboard(recoveryCode, { successMessage: t('txt_recovery_code_copied') });
                 }}
               >
                 <Clipboard size={14} className="btn-icon" />
