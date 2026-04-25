@@ -309,6 +309,7 @@ const messages: Record<Locale, Record<string, string>> = {
     txt_bulk_delete_sends_failed: "Bulk delete sends failed",
     txt_bulk_move_failed: "Bulk move failed",
     txt_cancel: "Cancel",
+    txt_continue: "Continue",
     txt_card: "Card",
     txt_card_details: "Card Details",
     txt_cardholder_name: "Cardholder Name",
@@ -387,6 +388,9 @@ const messages: Record<Locale, Record<string, string>> = {
     txt_device: "Device",
     txt_device_authorization_revoked: "Device trust revoked",
     txt_device_management: "Device Management",
+    txt_device_note: "Device Note",
+    txt_device_note_required: "Device name is required",
+    txt_device_note_updated: "Device name updated",
     txt_device_removed: "Device removed",
     txt_load_devices_failed: "Failed to load devices",
     txt_disable_this_send: "Disable this send",
@@ -414,6 +418,7 @@ const messages: Record<Locale, Record<string, string>> = {
     txt_encrypted_file_2: "Encrypted file",
     txt_enter_a_folder_name: "Enter a folder name.",
     txt_enter_master_password_to_disable_two_step_verification: "Enter master password to disable two-step verification.",
+    txt_enter_master_password_to_continue: "Enter your master password to continue.",
     txt_enter_master_password_to_view_this_item: "Enter master password to view this item.",
     txt_expiration_date: "Expiration Date",
     txt_expiration_days_0_never: "Expiration Days (0 = never)",
@@ -459,6 +464,8 @@ const messages: Record<Locale, Record<string, string>> = {
     txt_item_created: "Item created",
     txt_item_deleted: "Item deleted",
     txt_item_history: "Item History",
+    txt_password_history: "Password History",
+    txt_password_updated_value: "Password updated: {value}",
     txt_item_name_is_required: "Item name is required.",
     txt_item_updated: "Item updated",
     txt_last_edited_value: "Last edited: {value}",
@@ -550,6 +557,7 @@ const messages: Record<Locale, Record<string, string>> = {
     txt_not_trusted: "Not trusted",
     txt_note: "Note",
     txt_notes: "Notes",
+    txt_replace_device_name_with_note: "Set a custom name for this device without changing its detected system type.",
     txt_number: "Number",
     txt_open: "Open",
     txt_opera_browser: "Opera Browser",
@@ -592,9 +600,25 @@ const messages: Record<Locale, Record<string, string>> = {
     txt_recover_two_step_login: "Recover Two-step Login",
     txt_recovered_but_auto_login_failed_please_sign_in: "Recovered but auto-login failed, please sign in.",
     txt_recovery_code: "Recovery Code",
+    txt_recovery_code_and_api_key: "Recovery Code and API Key",
     txt_recovery_code_copied: "Recovery code copied",
     txt_recovery_code_is_empty: "Recovery code is empty",
     txt_recovery_code_loaded: "Recovery code loaded",
+    txt_api_key: "API Key",
+    txt_view_api_key: "View API Key",
+    txt_rotate_api_key: "Rotate API Key",
+    txt_api_key_copied: "API key copied",
+    txt_api_key_loaded: "API key loaded",
+    txt_api_key_rotated: "API key rotated",
+    txt_rotate_api_key_confirm: "Rotate API key? The current key will stop working immediately.",
+    txt_api_key_is_empty: "API key is empty",
+    txt_api_key_dialog_intro: "Your API key can be used to authenticate with the Bitwarden CLI.",
+    txt_api_key_warning_body: "Your API key is an alternative authentication mechanism. Keep it secret.",
+    txt_oauth_client_credentials: "OAuth 2.0 Client Credentials",
+    txt_client_id: "client_id",
+    txt_client_secret: "client_secret",
+    txt_scope: "scope",
+    txt_grant_type: "grant_type",
     txt_refresh: "Refresh",
     txt_refresh_in_seconds_s: "Refresh in {seconds}s",
     txt_regenerate: "Regenerate",
@@ -618,6 +642,8 @@ const messages: Record<Locale, Record<string, string>> = {
     txt_revoke_device_trust_failed: "Failed to revoke device trust",
     txt_revoke_all_device_trust_failed: "Failed to revoke all device trust",
     txt_revoke_trust: "Revoke Trust",
+    txt_untrust: "Untrust",
+    txt_update_device_note_failed: "Update device note failed",
     txt_role: "Role",
     txt_save: "Save",
     txt_save_profile: "Save Profile",
@@ -1018,6 +1044,7 @@ const zhCNOverrides: Record<string, string> = {
   txt_confirm_master_password: '确认主密码',
   txt_submit: '提交',
   txt_cancel: '取消',
+  txt_continue: '继续',
   txt_yes: '是',
   txt_no: '否',
   txt_loading: '加载中...',
@@ -1067,7 +1094,10 @@ const zhCNOverrides: Record<string, string> = {
   txt_additional_options: '附加选项',
   txt_custom_fields: '自定义字段',
   txt_notes: '备注',
+  txt_replace_device_name_with_note: '为这台设备设置自定义名称，不会改变系统识别到的设备类型。',
   txt_item_history: '项目历史',
+  txt_password_history: '密码历史记录',
+  txt_password_updated_value: '密码新于: {value}',
   txt_last_edited_value: '最后编辑：{value}',
   txt_created_value: '创建于：{value}',
   txt_username: '用户名',
@@ -1113,12 +1143,17 @@ const zhCNOverrides: Record<string, string> = {
   txt_view_recovery_code: '查看恢复代码',
   txt_copy_code: '复制代码',
   txt_device_management: '设备管理',
+  txt_device_note: '备注',
+  txt_device_note_required: '设备名称不能为空',
+  txt_device_note_updated: '设备名称已更新',
   txt_authorized_devices: '已授权设备',
   txt_device: '设备',
   txt_last_seen: '最后在线',
   txt_trusted_until: '信任至',
   txt_revoke_trust: '撤销信任',
+  txt_untrust: '不信任',
   txt_remove_device_2: '移除设备',
+  txt_update_device_note_failed: '更新设备备注失败',
   txt_not_trusted: '未信任',
   txt_unknown_device: '未知设备',
   txt_users: '用户',
@@ -1277,6 +1312,7 @@ const zhCNOverrides: Record<string, string> = {
   txt_encrypted_file_2: '加密文件',
   txt_enter_a_folder_name: '请输入文件夹名称',
   txt_enter_master_password_to_disable_two_step_verification: '输入主密码以禁用两步验证',
+  txt_enter_master_password_to_continue: '输入主密码以继续',
   txt_enter_master_password_to_view_this_item: '输入主密码以查看此项目',
   txt_expiry: '有效期',
   txt_expiry_month: '有效期月',
@@ -1345,8 +1381,24 @@ const zhCNOverrides: Record<string, string> = {
   txt_recover_2fa_failed: '恢复 2FA 失败',
   txt_recovered_but_auto_login_failed_please_sign_in: '已恢复，但自动登录失败，请手动登录',
   txt_recovery_code_copied: '恢复代码已复制',
+  txt_recovery_code_and_api_key: '恢复代码和 API 密钥',
   txt_recovery_code_is_empty: '恢复代码为空',
   txt_recovery_code_loaded: '恢复代码已加载',
+  txt_api_key: 'API 密钥',
+  txt_view_api_key: '查看 API 密钥',
+  txt_rotate_api_key: '轮换 API 密钥',
+  txt_api_key_copied: 'API 密钥已复制',
+  txt_api_key_loaded: 'API 密钥已加载',
+  txt_api_key_rotated: 'API 密钥已轮换',
+  txt_rotate_api_key_confirm: '轮换 API 密钥？当前密钥将立即失效。',
+  txt_api_key_is_empty: 'API 密钥为空',
+  txt_api_key_dialog_intro: '您的 API 密钥可用于在 Bitwarden CLI 中进行身份验证。',
+  txt_api_key_warning_body: '您的 API 密钥是一种替代身份验证机制。请严格保密。',
+  txt_oauth_client_credentials: 'OAuth 2.0 客户端凭据',
+  txt_client_id: 'client_id',
+  txt_client_secret: 'client_secret',
+  txt_scope: 'scope',
+  txt_grant_type: 'grant_type',
   txt_refresh_in_seconds_s: '{seconds} 秒后刷新',
   txt_registration_succeeded_please_sign_in: '注册成功，请登录',
   txt_remove_device: '移除设备',
@@ -1439,6 +1491,48 @@ zhCNOverrides.txt_lock = '锁定';
 zhCNOverrides.txt_menu = '菜单';
 zhCNOverrides.txt_settings = '设置';
 zhCNOverrides.txt_back = '返回';
+messages.en.txt_auto_lock = 'Auto-lock';
+messages.en.txt_auto_lock_description = 'Locks after inactivity. Closing and reopening the page always starts locked.';
+messages.en.txt_auto_lock_updated = 'Auto-lock updated';
+messages.en.txt_session_timeout = 'Session timeout';
+messages.en.txt_session_timeout_updated = 'Session timeout updated';
+messages.en.txt_timeout_time = 'Timeout time';
+messages.en.txt_timeout_action = 'Timeout action';
+messages.en.txt_timeout_action_logout = 'Log out';
+messages.en.txt_timeout_action_lock = 'Lock';
+messages.en.txt_in_planning = 'In planning';
+messages.en.txt_security_preferences = 'Security Preferences';
+messages.en.txt_timeout_1_minute = '1 minute';
+messages.en.txt_timeout_5_minutes = '5 minutes';
+messages.en.txt_timeout_15_minutes = '15 minutes';
+messages.en.txt_timeout_30_minutes = '30 minutes';
+messages.en.txt_timeout_never = 'Never';
+messages.en.txt_lock_after_1_minute = 'After 1 minute';
+messages.en.txt_lock_after_5_minutes = 'After 5 minutes';
+messages.en.txt_lock_after_15_minutes = 'After 15 minutes';
+messages.en.txt_lock_after_30_minutes = 'After 30 minutes';
+messages.en.txt_lock_after_never = 'Never for inactivity';
+zhCNOverrides.txt_auto_lock = '会话超时';
+zhCNOverrides.txt_auto_lock_description = '页面闲置后执行会话超时动作；关闭页面或浏览器后再次打开始终进入锁定页。';
+zhCNOverrides.txt_auto_lock_updated = '会话超时已更新';
+zhCNOverrides.txt_session_timeout = '会话超时';
+zhCNOverrides.txt_session_timeout_updated = '会话超时已更新';
+zhCNOverrides.txt_timeout_time = '超时时间';
+zhCNOverrides.txt_timeout_action = '超时动作';
+zhCNOverrides.txt_timeout_action_logout = '注销';
+zhCNOverrides.txt_timeout_action_lock = '锁定';
+zhCNOverrides.txt_in_planning = '构思中';
+zhCNOverrides.txt_security_preferences = '安全偏好';
+zhCNOverrides.txt_timeout_1_minute = '1 分钟';
+zhCNOverrides.txt_timeout_5_minutes = '5 分钟';
+zhCNOverrides.txt_timeout_15_minutes = '15 分钟';
+zhCNOverrides.txt_timeout_30_minutes = '30 分钟';
+zhCNOverrides.txt_timeout_never = '从不';
+zhCNOverrides.txt_lock_after_1_minute = '闲置 1 分钟后';
+zhCNOverrides.txt_lock_after_5_minutes = '闲置 5 分钟后';
+zhCNOverrides.txt_lock_after_15_minutes = '闲置 15 分钟后';
+zhCNOverrides.txt_lock_after_30_minutes = '闲置 30 分钟后';
+zhCNOverrides.txt_lock_after_never = '不因闲置锁定';
 zhCNOverrides.txt_attachments = '附件';
 zhCNOverrides.txt_upload_attachments = '上传附件';
 zhCNOverrides.txt_new_attachments = '待上传附件';
