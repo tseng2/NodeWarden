@@ -54,6 +54,7 @@ import { useToastManager } from '@/hooks/useToastManager';
 import { t } from '@/lib/i18n';
 import { APP_NOTIFY_EVENT, type AppNotifyDetail } from '@/lib/app-notify';
 import { dispatchBackupProgress, type BackupProgressDetail } from '@/lib/backup-restore-progress';
+import { clearOfflineUnlockRecord } from '@/lib/offline-auth';
 import { decryptSends, decryptVaultCore } from '@/lib/vault-decrypt';
 import { decryptSendsInWorker, decryptVaultCoreInWorker } from '@/lib/vault-worker';
 import {
@@ -433,6 +434,7 @@ export default function App() {
     (async () => {
       const boot = await bootstrapAppSession(initialBootstrap);
       if (!mounted) return;
+      if (sessionRef.current?.symEncKey || sessionRef.current?.symMacKey) return;
       setDefaultKdfIterations(boot.defaultKdfIterations);
       setRegistrationInviteRequired(boot.registrationInviteRequired);
       setJwtWarning(boot.jwtWarning);
@@ -746,6 +748,7 @@ export default function App() {
     setConfirm(null);
     setSession(null);
     clearProfileSnapshot();
+    clearOfflineUnlockRecord();
     setProfile(null);
     setUnlockPreparing(false);
     setPendingTotp(null);
@@ -910,7 +913,7 @@ export default function App() {
   const vaultCoreQuery = useQuery({
     queryKey: ['vault-core', vaultCacheKey],
     queryFn: () => loadVaultCoreSyncSnapshot(authedFetch, vaultCacheKey),
-    enabled: !IS_DEMO_MODE && phase === 'app' && !!session?.symEncKey && !!session?.symMacKey && !!vaultCacheKey,
+    enabled: !IS_DEMO_MODE && phase === 'app' && !!session?.accessToken && !!session?.symEncKey && !!session?.symMacKey && !!vaultCacheKey,
     staleTime: 30_000,
   });
   const encryptedVaultCore = vaultCoreQuery.data || cachedVaultCore;
@@ -921,7 +924,7 @@ export default function App() {
   const sendsQuery = useQuery({
     queryKey: sendsQueryKey,
     queryFn: () => getSends(authedFetch),
-    enabled: !IS_DEMO_MODE && phase === 'app' && !!session?.symEncKey && !!session?.symMacKey && location === '/sends' && !encryptedSendsFromSync,
+    enabled: !IS_DEMO_MODE && phase === 'app' && !!session?.accessToken && !!session?.symEncKey && !!session?.symMacKey && location === '/sends' && !encryptedSendsFromSync,
     staleTime: 30_000,
   });
   const encryptedSends = sendsQuery.data || encryptedSendsFromSync;
@@ -950,13 +953,13 @@ export default function App() {
   const usersQuery = useQuery({
     queryKey: ['admin-users', vaultCacheKey],
     queryFn: () => listAdminUsers(authedFetch),
-    enabled: !IS_DEMO_MODE && phase === 'app' && isAdmin && vaultInitialDecryptDone,
+    enabled: !IS_DEMO_MODE && phase === 'app' && !!session?.accessToken && isAdmin && vaultInitialDecryptDone,
     staleTime: 30_000,
   });
   const invitesQuery = useQuery({
     queryKey: ['admin-invites', vaultCacheKey],
     queryFn: () => listAdminInvites(authedFetch),
-    enabled: !IS_DEMO_MODE && phase === 'app' && isAdmin && vaultInitialDecryptDone,
+    enabled: !IS_DEMO_MODE && phase === 'app' && !!session?.accessToken && isAdmin && vaultInitialDecryptDone,
     staleTime: 30_000,
   });
   const totpStatusQuery = useQuery({
@@ -1013,7 +1016,7 @@ export default function App() {
   useQuery({
     queryKey: ['admin-backup-settings', vaultCacheKey],
     queryFn: () => backupActions.loadSettings(),
-    enabled: !IS_DEMO_MODE && phase === 'app' && isAdmin && vaultInitialDecryptDone,
+    enabled: !IS_DEMO_MODE && phase === 'app' && !!session?.accessToken && isAdmin && vaultInitialDecryptDone,
     staleTime: 30_000,
   });
 
@@ -1083,6 +1086,7 @@ export default function App() {
         setDecryptedFolders(result.folders);
         setDecryptedCiphers(result.ciphers);
         setVaultInitialDecryptDone(true);
+        if (!session.accessToken) return;
         const repairKey = `${session.accessToken}:${encryptedCiphers.map((cipher) => `${cipher.id}:${cipher.revisionDate || ''}`).join(',')}`;
         if (uriChecksumRepairAttemptRef.current !== repairKey) {
           uriChecksumRepairAttemptRef.current = repairKey;
